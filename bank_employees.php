@@ -31,30 +31,68 @@
 <html lang="en">
 <head>
     <title>Employees</title>
-	<meta charset ="utf-8"> 
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
 </head>
 <body>
-	<h2>Employees</h2>
-
-	<table>
-		<tr>
-			<th>Employee ID</th>
-			<th>First Name</th>
+    <h2>Branch <?php echo htmlspecialchars($bank_id); ?>: Employees</h2>
+    <table>
+        <tr>
+            <th>Employee ID</th>
+            <th>First Name</th>
             <th>Last Name</th>
             <th>Manager ID</th>
             <th>Branch ID</th>
-
-		</tr>	
-		<?php foreach ($result as $auth) {
-			echo "<tr>";
-			echo "<td>".$auth['employeeID']."</td>";
-			echo "<td>".$auth['employeeFirstName']."</td>";
-            echo "<td>".$auth['employeeLastName']."</td>";
-            echo "<td>".$auth['managerID']."</td>";
-            echo "<td>".$auth['branchID']."</td>";
-			echo "</tr>";
-		}
-		?>
-	</table>
-</body>    
+        </tr>
+        <?php foreach ($result as $auth) { ?>
+            <tr>
+                <td><?php echo htmlspecialchars($auth['employeeID']); ?></td>
+                <td><?php echo htmlspecialchars($auth['employeeFirstName']); ?></td>
+                <td><?php echo htmlspecialchars($auth['employeeLastName']); ?></td>
+                <td><?php echo htmlspecialchars($auth['managerID']); ?></td>
+                <td><?php echo htmlspecialchars($auth['branchID']); ?></td>
+            </tr>
+        <?php } ?>
+    </table>
+</body>
 </html>
