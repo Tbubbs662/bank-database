@@ -13,7 +13,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <!-- Johnathan Friend -->
 </head>
 <body>
     <h2>Bank Branches</h2>
@@ -85,7 +84,7 @@
         </tr>    
         <?php foreach ($result as $branch) {
             echo "<tr>";
-            echo "<td>".$branch['branchID']."</td>";
+            echo "<td><a href='bank_employees.php?bank-id=".$branch['branchID']."'>".$branch['branchID']."</a></td>";
             echo "<td>".$branch['branchName']."</td>";
             echo "<td>".$branch['branchCity']."</td>";
             echo "<td>".$branch['branchStreet']."</td>";

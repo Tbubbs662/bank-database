@@ -1,6 +1,6 @@
 <?php
 	ini_set ('error_reporting', 1); //Turns on error reporting - remove once everything works.
-	if(isset($_GET['submit'])) {
+	if(isset($_GET['submit']) || isset($_GET['bank-id'])) {
         $bank_id = $_GET["bank-id"];
         try{
             require_once('../pdo_connect.php'); //Connect to the database
@@ -15,7 +15,7 @@
         }
         $affected = $stmt->RowCount();
         if ($affected == 0){
-			echo "We could not find a book matching that description. Please try again.";
+			echo "We could not find a bank matching that description. Please try again.";
 			exit;
 		}	
 		else {
