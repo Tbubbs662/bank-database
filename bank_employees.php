@@ -6,9 +6,17 @@
             require_once('../pdo_connect.php'); //Connect to the database
             $sql = 'SELECT employeeID, employeeFirstName, employeeLastName, managerID, branchID FROM Employee WHERE branchID = ?
             ORDER BY employeeLastName';
+			$sql2 = 'SELECT DISTINCT c.customerID, c.customerFirstName, c.customerLastName, c.customerEmail FROM Customer c
+			JOIN Account a ON c.customerID = a.customerID
+			WHERE a.branchID = ?
+			ORDER BY c.customerLastName;';
             $stmt = $dbc->prepare($sql);
 			$stmt->bindParam(1, $bank_id);
 			$stmt->execute();
+			$stmt2 = $dbc->prepare($sql2);
+			$stmt2->bindParam(1, $bank_id);
+			$stmt2->execute();
+
             //$result = $dbc-> query($sql);
         } catch (PDOException $e){
             echo $e->getMessage();
@@ -20,6 +28,7 @@
 		}	
 		else {
 			$result = $stmt->fetchAll();
+			$result2 = $stmt2->fetchAll();
 		}
     }
     else {
@@ -94,5 +103,27 @@
             </tr>
         <?php } ?>
     </table>
+
+	<h2>Branch <?php echo htmlspecialchars($bank_id); ?>: Customers</h2>
+    <table>
+        <tr>
+            <th>Customer ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Customer Email</th>
+            <th>Branch ID</th>
+        </tr>
+        <?php foreach ($result2 as $cust) { ?>
+            <tr>
+                <td><?php echo htmlspecialchars($cust['customerID']); ?></td>
+                <td><?php echo htmlspecialchars($cust['customerFirstName']); ?></td>
+                <td><?php echo htmlspecialchars($cust['customerLastName']); ?></td>
+                <td><?php echo htmlspecialchars($cust['customerEmail']); ?></td>
+                <td><?php echo htmlspecialchars($auth['branchID']); ?></td>
+            </tr>
+        <?php } ?>
+    </table>
+
+	
 </body>
 </html>
