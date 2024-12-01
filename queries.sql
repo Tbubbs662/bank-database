@@ -43,5 +43,33 @@ END //
 DELIMITER ;
 
 /*TRIGGER QUERY*/
+DELIMITER $$
+CREATE TRIGGER AfterTransactionInsert
+AFTER INSERT ON Transaction
+FOR EACH ROW
+BEGIN
+    -- Call the procedure to update balance
+    CALL UpdateAccountBalance(NEW.accountID, NEW.transactionAmount, NEW.transactionType);
+END$$
+DELIMITER ;
 
 /*PROCEDURE QUERY*/
+DELIMITER $$
+CREATE PROCEDURE UpdateAccountBalance(
+    IN account_id INT, 
+    IN trans_amount DECIMAL(10, 2), 
+    IN trans_type VARCHAR(10)
+)
+BEGIN
+    -- Update the Account balance based on the transaction type
+    IF trans_type = 'deposit' THEN
+        UPDATE Account
+        SET Balance = Balance + trans_amount
+        WHERE AccountID = account_id;
+    ELSEIF trans_type = 'withdrawal' THEN
+        UPDATE Account
+        SET Balance = Balance - trans_amount
+        WHERE AccountID = account_id;
+    END IF;
+END$$
+DELIMITER ;
