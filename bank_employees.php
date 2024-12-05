@@ -4,18 +4,18 @@
         $bank_id = $_GET["bank-id"];
         try{
             require_once('../pdo_connect.php'); //Connect to the database
-            $sql = 'SELECT employeeID, employeeFirstName, employeeLastName, managerID, branchID FROM Employee WHERE branchID = ?
-            ORDER BY employeeLastName';
-			$sql2 = 'SELECT DISTINCT c.customerID, c.customerFirstName, c.customerLastName, c.customerEmail FROM Customer c
-			JOIN Account a ON c.customerID = a.customerID
-			WHERE a.branchID = ?
-			ORDER BY c.customerLastName;';
+            $sql = 'SELECT emp1.employeeID, emp1.employeeFirstName, emp1.employeeLastName, emp2.employeeFirstName AS "managerFirstName", emp2.employeeLastName AS "managerLastName", emp1.branchID FROM Employee AS emp1 LEFT JOIN Employee AS emp2 ON emp1.managerID = emp2.employeeID WHERE emp1.branchID = ? ORDER BY emp1.employeeLastName;';
+			$sql2 = 'SELECT DISTINCT c.customerID, c.customerFirstName, c.customerLastName, c.customerEmail, p.customerPhoneNum FROM Customer c Natural JOIN Account a 
+            NATURAL JOIN CustomerPhoneNums p WHERE c.customerID = a.customerID AND a.branchID = ? ORDER BY c.customerLastName;';
             $stmt = $dbc->prepare($sql);
 			$stmt->bindParam(1, $bank_id);
 			$stmt->execute();
 			$stmt2 = $dbc->prepare($sql2);
 			$stmt2->bindParam(1, $bank_id);
 			$stmt2->execute();
+            $stmt3 = $dbc->prepare($sql3);
+            $stmt3->bindParam(1, $bank_id);
+            $stmt3->execute();
 
             //$result = $dbc-> query($sql);
         } catch (PDOException $e){
@@ -29,6 +29,8 @@
 		else {
 			$result = $stmt->fetchAll();
 			$result2 = $stmt2->fetchAll();
+            $total_balance_result = $stmt3->fetch(PDO::FETCH_ASSOC);
+            $total_balance = $total_balance_result['total_balance'] ?? 'N/A';
 		}
     }
     else {
@@ -85,12 +87,14 @@
 </head>
 <body>
     <h2>Branch <?php echo htmlspecialchars($bank_id); ?>: Employees</h2>
+    <h3>Total balance of assets: $<?php echo htmlspecialchars($total_balance); ?></h3>
     <table>
         <tr>
             <th>Employee ID</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Manager ID</th>
+            <th>Manager First Name</th>
+            <th>Manager Last Name</th>
             <th>Branch ID</th>
         </tr>
         <?php foreach ($result as $auth) { ?>
@@ -98,7 +102,8 @@
                 <td><?php echo htmlspecialchars($auth['employeeID']); ?></td>
                 <td><?php echo htmlspecialchars($auth['employeeFirstName']); ?></td>
                 <td><?php echo htmlspecialchars($auth['employeeLastName']); ?></td>
-                <td><?php echo htmlspecialchars($auth['managerID']); ?></td>
+                <td><?php echo htmlspecialchars($auth['managerFirstName']); ?></td>
+                <td><?php echo htmlspecialchars($auth['managerLastName']); ?></td>
                 <td><?php echo htmlspecialchars($auth['branchID']); ?></td>
             </tr>
         <?php } ?>
@@ -112,6 +117,7 @@
             <th>Last Name</th>
             <th>Customer Email</th>
             <th>Branch ID</th>
+            <th>Customer Phone Number</th>
         </tr>
         <?php foreach ($result2 as $cust) { ?>
             <tr>
@@ -122,6 +128,7 @@
                 <td><?php echo htmlspecialchars($cust['customerLastName']); ?></td>
                 <td><?php echo htmlspecialchars($cust['customerEmail']); ?></td>
                 <td><?php echo htmlspecialchars($auth['branchID']); ?></td>
+                <td><?php echo htmlspecialchars($auth['customerPhoneNum']); ?></td>
             </tr>
         <?php } ?>
     </table>
