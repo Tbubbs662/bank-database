@@ -9,12 +9,16 @@
 			JOIN Account a ON c.customerID = a.customerID
 			WHERE a.branchID = ?
 			ORDER BY c.customerLastName;';
+            $sql3 = 'SELECT branch_total(?) AS total_balance';
             $stmt = $dbc->prepare($sql);
 			$stmt->bindParam(1, $bank_id);
 			$stmt->execute();
 			$stmt2 = $dbc->prepare($sql2);
 			$stmt2->bindParam(1, $bank_id);
 			$stmt2->execute();
+            $stmt3 = $dbc->prepare($sql3);
+            $stmt3->bindParam(1, $bank_id);
+            $stmt3->execute();
 
             //$result = $dbc-> query($sql);
         } catch (PDOException $e){
@@ -28,6 +32,8 @@
 		else {
 			$result = $stmt->fetchAll();
 			$result2 = $stmt2->fetchAll();
+            $total_balance_result = $stmt3->fetch(PDO::FETCH_ASSOC);
+            $total_balance = $total_balance_result['total_balance'] ?? 'N/A';
 		}
     }
     else {
@@ -84,6 +90,7 @@
 </head>
 <body>
     <h2>Branch <?php echo htmlspecialchars($bank_id); ?>: Employees</h2>
+    <h3>Total balance of assets: $<?php echo htmlspecialchars($total_balance); ?></h3>
     <table>
         <tr>
             <th>Employee ID</th>
