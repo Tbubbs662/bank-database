@@ -94,6 +94,16 @@
             echo "</tr>";
         } ?>
     </table>
+
+    <form method="get" action="total_transaction.php">
+        <div class="form-container">
+            <label for="amount">See Customers with Total Transactions Amount Over:</label>
+            <input type="text" name="amount" id="amount">
+            <input type="submit" name="submit" value="Submit">
+        </div>
+    </form>
+
+
     <div class="button-div">
         <button class="menu-button" type="button" onclick="window.location.href='index.html';">Menu</button>
     </div>

@@ -41,6 +41,14 @@
              $stmt2 = $dbc->prepare($sql2);
              $stmt2->bindParam(1, $customer_id);
              $stmt2->execute();
+
+             $sql3 = 'SELECT acct_total(?) AS total_balance';
+             $stmt3 = $dbc->prepare($sql3);
+             $stmt3->bindParam(1, $customer_id);
+             $stmt3->execute();
+             
+
+
  
             
         } catch (PDOException $e) {
@@ -53,6 +61,8 @@
         } else {
             $result1 = $stmt1->fetchAll();
             $result2 = $stmt2->fetchAll();
+            $total_balance_result = $stmt3->fetch(PDO::FETCH_ASSOC);
+            $total_balance = $total_balance_result['total_balance'] ?? 'N/A';
         }
     } else {
         echo "<h2>You have reached this page in error</h2>";
@@ -155,6 +165,16 @@
             echo "</tr>";
         } ?>
     </table>
+    <table>
+    <tr>
+        <th>Total Balance on Accounts</th>
+    </tr>
+    <tr>
+        <td>$<?php echo htmlspecialchars($total_balance); ?></td>
+    </tr>
+    </table>
+        
+    <h3>Add a Transaction</h3>
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . "?customer-id=" . urlencode($customer_id)); ?>">
     <label for="account-id">Account ID:</label>
     <select name="account-id" id="account-id" required>
@@ -164,8 +184,8 @@
             </option>
         <?php } ?>
     </select>
+    </table>
     <br><br>
-
     <label for="transaction-type">Transaction Type:</label>
     <select name="transaction-type" id="transaction-type" required>
         <option value="Deposit">Deposit</option>
@@ -201,8 +221,5 @@
     <div class="button-div">
         <button class="menu-button" type="button" onclick="window.location.href='index.html';">Menu</button>
     </div>
-
-    <h3>Add a Transaction</h3>
-
 </body>
 </html>
