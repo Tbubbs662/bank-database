@@ -139,7 +139,7 @@
                 <td><?php echo htmlspecialchars($cust['customerLastName']); ?></td>
                 <td><?php echo htmlspecialchars($cust['customerEmail']); ?></td>
                 <td><?php echo htmlspecialchars($auth['branchID']); ?></td>
-                <td><?php echo htmlspecialchars($auth['customerPhoneNum']); ?></td>
+                <td><?php echo htmlspecialchars($cust['customerPhoneNum']); ?></td>
             </tr>
         <?php } ?>
     </table>
