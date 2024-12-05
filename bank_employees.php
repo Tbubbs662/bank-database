@@ -7,15 +7,25 @@
             $sql = 'SELECT emp1.employeeID, emp1.employeeFirstName, emp1.employeeLastName, emp2.employeeFirstName AS "managerFirstName", emp2.employeeLastName AS "managerLastName", emp1.branchID FROM Employee AS emp1 LEFT JOIN Employee AS emp2 ON emp1.managerID = emp2.employeeID WHERE emp1.branchID = ? ORDER BY emp1.employeeLastName;';
 			$sql2 = 'SELECT DISTINCT c.customerID, c.customerFirstName, c.customerLastName, c.customerEmail, p.customerPhoneNum FROM Customer c Natural JOIN Account a 
             NATURAL JOIN CustomerPhoneNums p WHERE c.customerID = a.customerID AND a.branchID = ? ORDER BY c.customerLastName;';
+            $sql3 = 'SELECT branch_total(?) AS total_balance';
+            $sql4 = 'SELECT c.*, a.balance FROM Customer c JOIN Account a ON c.customerID = a.customerID WHERE a.BranchID = ? AND a.balance = ( SELECT MAX(balance) FROM Account WHERE BranchID = ? );';
+
             $stmt = $dbc->prepare($sql);
 			$stmt->bindParam(1, $bank_id);
 			$stmt->execute();
-			$stmt2 = $dbc->prepare($sql2);
+			
+            $stmt2 = $dbc->prepare($sql2);
 			$stmt2->bindParam(1, $bank_id);
 			$stmt2->execute();
+            
             $stmt3 = $dbc->prepare($sql3);
             $stmt3->bindParam(1, $bank_id);
             $stmt3->execute();
+
+            $stmt4 = $dbc->prepare($sql4);
+            $stmt4->bindParam(1, $bank_id);
+            $stmt4->bindParam(2, $bank_id);
+            $stmt4->execute();
 
             //$result = $dbc-> query($sql);
         } catch (PDOException $e){
@@ -31,6 +41,7 @@
 			$result2 = $stmt2->fetchAll();
             $total_balance_result = $stmt3->fetch(PDO::FETCH_ASSOC);
             $total_balance = $total_balance_result['total_balance'] ?? 'N/A';
+            $result4 = $stmt4->fetchAll();
 		}
     }
     else {
@@ -132,7 +143,25 @@
             </tr>
         <?php } ?>
     </table>
-
-	
+    
+    <h2>Branch <?php echo htmlspecialchars($bank_id); ?>: #1 Customer with highest balance</h2>
+    <table>
+        <tr>
+            <th>Balance</th>
+            <th>Customer ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Customer Email</th>
+        </tr>
+        <?php foreach ($result4 as $cust) { ?>
+            <tr>
+                <td><?php echo htmlspecialchars($cust['customerID']); ?></td>
+                <td><?php echo htmlspecialchars($cust['balance']); ?></td>
+                <td><?php echo htmlspecialchars($cust['customerFirstName']); ?></td>
+                <td><?php echo htmlspecialchars($cust['customerLastName']); ?></td>
+                <td><?php echo htmlspecialchars($cust['customerEmail']); ?></td>
+            </tr>
+        <?php } ?>
+    </table>
 </body>
 </html>
