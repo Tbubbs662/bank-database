@@ -11,11 +11,7 @@
                 $transaction_amount = $_POST['transaction-amount'];
                 $prefix = "TXN";
                 $unique_id = uniqid(); 
-                $transaction_id = "{$prefix}{$unique_id}";
-
-
-                    // Fetch accounts and transactions for the customer
-                
+                $transaction_id = "{$prefix}{$unique_id}";             
                 
                 $sql_insert = 'INSERT INTO Transactions (accountID, customerID, transactionType, transactionAmount, transactionDateTime, transactionID)
                                VALUES (?, ?, ?, ?, NOW(), ?)';

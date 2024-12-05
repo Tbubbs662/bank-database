@@ -18,6 +18,8 @@ SELECT DISTINCT c.customerID, c.customerFirstName, c.customerLastName, c.custome
 SELECT emp1.employeeID, emp1.employeeFirstName, emp1.employeeLastName, emp2.employeeFirstName AS "managerFirstName", emp2.employeeLastName AS 
 "managerLastName", emp1.branchID FROM Employee AS emp1 LEFT JOIN Employee AS emp2 ON emp1.managerID = emp2.employeeID WHERE emp1.branchID = ? ORDER BY emp1.employeeLastName;
 
+
+
 /*STORED FUNCTIONS*/
 DELIMITER //
 CREATE FUNCTION acct_total(customerID CHAR(32))
@@ -78,3 +80,30 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+
+/*Customer Query*/
+SELECT * FROM Account WHERE customerID = ?
+
+/*Transactions Query*/
+SELECT * FROM Transactions WHERE customerID = ? ORDER BY transactionDateTime DESC
+
+/*Total Balance Across All Accounts*/
+SELECT acct_total(?) AS total_balance
+
+/*Create New Transaction*/
+INSERT INTO Transactions (accountID, customerID, transactionType, transactionAmount, transactionDateTime, transactionID) VALUES (?, ?, ?, ?, NOW(), ?)
+
+/*Query Using GROUP BY and HAVING*/
+SELECT c.customerID, c.customerFirstName, c.customerLastName, SUM(t.transactionAmount) AS total_spent
+FROM Customer c
+JOIN Transactions t ON c.customerID = t.customerID
+GROUP BY c.customerID, c.customerFirstName, c.customerLastName
+HAVING SUM(t.transactionAmount) > ?
+ORDER BY total_spent DESC
+
+/*Individual with highest account balance for the branch*/
+SELECT c.*, a.balance FROM Customer c JOIN Account a ON c.customerID = a.customerID WHERE a.BranchID = ? AND a.balance = ( SELECT MAX(balance) FROM Account WHERE BranchID = ? );
+
+/*Total amount of all of the branches*/
+SELECT branch_total(?) AS total_balance
