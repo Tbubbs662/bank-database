@@ -43,10 +43,10 @@
 
                 echo "<p class='success-message'>Transaction added successfully!</p>";
             }
+            
         } catch (PDOException $e) {
             echo "<p class='error-message'>" . $e->getMessage() . "</p>";
         }
-
         $affected = $stmt1->RowCount();
         if ($affected == 0) {
             echo "We could not find a customer matching that description. Please try again.";
