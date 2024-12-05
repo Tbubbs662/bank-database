@@ -4,8 +4,7 @@
         $bank_id = $_GET["bank-id"];
         try{
             require_once('../pdo_connect.php'); //Connect to the database
-            $sql = 'SELECT employeeID, employeeFirstName, employeeLastName, managerID, branchID FROM Employee WHERE branchID = ?
-            ORDER BY employeeLastName';
+            $sql = 'SELECT emp1.employeeID, emp1.employeeFirstName, emp1.employeeLastName, emp2.employeeFirstName AS "managerFirstName", emp2.employeeLastName AS "managerLastName", emp1.branchID FROM Employee AS emp1 LEFT JOIN Employee AS emp2 ON emp1.managerID = emp2.employeeID WHERE emp1.branchID = ? ORDER BY emp1.employeeLastName;';
 			$sql2 = 'SELECT DISTINCT c.customerID, c.customerFirstName, c.customerLastName, c.customerEmail FROM Customer c
 			JOIN Account a ON c.customerID = a.customerID
 			WHERE a.branchID = ?
@@ -90,7 +89,8 @@
             <th>Employee ID</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Manager ID</th>
+            <th>Manager First Name</th>
+            <th>Manager Last Name</th>
             <th>Branch ID</th>
         </tr>
         <?php foreach ($result as $auth) { ?>
@@ -98,7 +98,8 @@
                 <td><?php echo htmlspecialchars($auth['employeeID']); ?></td>
                 <td><?php echo htmlspecialchars($auth['employeeFirstName']); ?></td>
                 <td><?php echo htmlspecialchars($auth['employeeLastName']); ?></td>
-                <td><?php echo htmlspecialchars($auth['managerID']); ?></td>
+                <td><?php echo htmlspecialchars($auth['managerFirstName']); ?></td>
+                <td><?php echo htmlspecialchars($auth['managerLastName']); ?></td>
                 <td><?php echo htmlspecialchars($auth['branchID']); ?></td>
             </tr>
         <?php } ?>
