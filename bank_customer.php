@@ -1,32 +1,61 @@
 <?php
-	ini_set ('error_reporting', 1); //Turns on error reporting - remove once everything works.
-	if(isset($_GET['submit']) || isset($_GET['customer-id'])) {
+    ini_set ('error_reporting', 1); // Turns on error reporting - remove once everything works.
+    if(isset($_GET['submit']) || isset($_GET['customer-id'])) {
         $customer_id = $_GET["customer-id"];
-        try{
-            require_once('../pdo_connect.php'); //Connect to the database
+        try {
+            require_once('../pdo_connect.php'); // Connect to the database
+
+            // Fetch accounts and transactions for the customer
             $sql1 = 'SELECT * FROM Account WHERE customerID = ?';
             $stmt1 = $dbc->prepare($sql1);
-			$stmt1->bindParam(1, $customer_id);
-			$stmt1->execute();
-            
+            $stmt1->bindParam(1, $customer_id);
+            $stmt1->execute();
+
             $sql2 = 'SELECT * FROM Transactions WHERE customerID = ?';
             $stmt2 = $dbc->prepare($sql2);
-			$stmt2->bindParam(1, $customer_id);
-			$stmt2->execute();
-        } catch (PDOException $e){
-            echo $e->getMessage();
+            $stmt2->bindParam(1, $customer_id);
+            $stmt2->execute();
+
+           
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-transaction'])) {
+                $account_id = $_POST['account-id'];
+                $transaction_type = $_POST['transaction-type'];
+                $transaction_amount = $_POST['transaction-amount'];
+                $prefix = "TXN";
+                $unique_id = uniqid(); 
+                $transaction_id = "{$prefix}{$unique_id}";
+
+
+                
+                $sql_insert = 'INSERT INTO Transactions (accountID, customerID, transactionType, transactionAmount, transactionDateTime, transactionID)
+                               VALUES (?, ?, ?, ?, NOW(), ?)';
+                $stmt_insert = $dbc->prepare($sql_insert);
+                $stmt_insert->bindParam(1, $account_id);
+                $stmt_insert->bindParam(2, $customer_id);
+                $stmt_insert->bindParam(3, $transaction_type);
+                $stmt_insert->bindParam(4, $transaction_amount);
+                $stmt_insert->bindParam(5, $transaction_id);
+                $stmt_insert->execute();
+
+                // Refresh transactions to include the new one
+                $stmt2->execute();
+                $result2 = $stmt2->fetchAll();
+
+                echo "<p class='success-message'>Transaction added successfully!</p>";
+            }
+        } catch (PDOException $e) {
+            echo "<p class='error-message'>" . $e->getMessage() . "</p>";
         }
+
         $affected = $stmt1->RowCount();
-        if ($affected == 0){
-			echo "We could not find a customer matching that description. Please try again.";
-			exit;
-		}	
-		else {
-			$result1 = $stmt1->fetchAll();
+        if ($affected == 0) {
+            echo "We could not find a customer matching that description. Please try again.";
+            exit;
+        } else {
+            $result1 = $stmt1->fetchAll();
             $result2 = $stmt2->fetchAll();
-		}
-    }
-    else {
+        }
+    } else {
         echo "<h2>You have reached this page in error</h2>";
         exit;
     }
@@ -149,5 +178,31 @@
     <div class="button-div">
         <button class="menu-button" type="button" onclick="window.location.href='index.html';">Menu</button>
     </div>
+
+    <h3>Add a Transaction</h3>
+<form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . "?customer-id=" . urlencode($customer_id)); ?>">
+    <label for="account-id">Account ID:</label>
+    <select name="account-id" id="account-id" required>
+        <?php foreach ($result1 as $account) { ?>
+            <option value="<?php echo htmlspecialchars($account['accountID']); ?>">
+                <?php echo htmlspecialchars($account['accountID']); ?>
+            </option>
+        <?php } ?>
+    </select>
+    <br><br>
+
+    <label for="transaction-type">Transaction Type:</label>
+    <select name="transaction-type" id="transaction-type" required>
+        <option value="Deposit">Deposit</option>
+        <option value="Withdrawal">Withdrawal</option>
+    </select>
+    <br><br>
+
+    <label for="transaction-amount">Transaction Amount:</label>
+    <input type="number" name="transaction-amount" id="transaction-amount" step="0.01" required>
+    <br><br>
+
+    <button type="submit" name="add-transaction" class="menu-button">Add Transaction</button>
+</form>
 </body>
 </html>
