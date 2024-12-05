@@ -115,7 +115,9 @@
         </tr>
         <?php foreach ($result2 as $cust) { ?>
             <tr>
-                <td><?php echo htmlspecialchars($cust['customerID']); ?></td>
+                <td><a href="bank_customer.php?customer-id=<?php echo urlencode($cust['customerID']); ?>">
+                <?php echo htmlspecialchars($cust['customerID']); ?>
+    </a></td>
                 <td><?php echo htmlspecialchars($cust['customerFirstName']); ?></td>
                 <td><?php echo htmlspecialchars($cust['customerLastName']); ?></td>
                 <td><?php echo htmlspecialchars($cust['customerEmail']); ?></td>
