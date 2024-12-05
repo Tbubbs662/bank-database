@@ -7,11 +7,16 @@ SELECT * FROM Branch JOIN BranchPhoneNums USING(branchID);
 SELECT employeeID, employeeFirstName, employeeLastName, managerID, branchID FROM Employee WHERE branchID = ?
 ORDER BY employeeLastName;
 
-/*Customer Query*/
+/*Two Table Join*/
+SELECT * FROM Branch JOIN BranchPhoneNums USING(branchID);
 
-/*Customer Account Query*/
+/*Three Table Join*/
+SELECT DISTINCT c.customerID, c.customerFirstName, c.customerLastName, c.customerEmail, p.customerPhoneNum FROM Customer c Natural JOIN Account a 
+            NATURAL JOIN CustomerPhoneNums p WHERE c.customerID = a.customerID AND a.branchID = ? ORDER BY c.customerLastName;
 
-/*Transactions Query*/
+/*Self-Join*/
+SELECT emp1.employeeID, emp1.employeeFirstName, emp1.employeeLastName, emp2.employeeFirstName AS "managerFirstName", emp2.employeeLastName AS 
+"managerLastName", emp1.branchID FROM Employee AS emp1 LEFT JOIN Employee AS emp2 ON emp1.managerID = emp2.employeeID WHERE emp1.branchID = ? ORDER BY emp1.employeeLastName;
 
 /*STORED FUNCTIONS*/
 DELIMITER //
